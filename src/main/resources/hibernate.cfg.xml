@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- SQL Server connection settings -->
+        <property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+        <property name="hibernate.connection.url">jdbc:sqlserver://localhost:1433;databaseName=CoffeeShop;encrypt=true;trustServerCertificate=true</property>
+        <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.password">123</property>
+
+        <!-- SQL dialect -->
+        <property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
+
+        <!-- Echo all executed SQL to console -->
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <!-- Drop and re-create the database schema on startup -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <mapping class="model.Ban"/>
+        <mapping class="model.ChiTietHoaDon"/>
+        <mapping class="model.ChiTietPhieuNhap"/>
+        <mapping class="model.ChiTietPhieuXuat"/>
+        <mapping class="model.ChiTietTopping"/>
+        <mapping class="model.HoaDon"/>
+        <mapping class="model.NguyenLieu"/>
+        <mapping class="model.PhieuNhapKho"/>
+        <mapping class="model.PhieuXuatKho"/>
+        <mapping class="model.SanPham"/>
+        <mapping class="model.Topping"/>
+        <mapping class="model.Sysdiagram"/>
+
+    </session-factory>
+</hibernate-configuration>
