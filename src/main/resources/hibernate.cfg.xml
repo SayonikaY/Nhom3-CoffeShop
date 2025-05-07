@@ -19,18 +19,18 @@
 
         <!-- Drop and re-create the database schema on startup -->
         <property name="hibernate.hbm2ddl.auto">update</property>
-        <mapping class="model.Ban"/>
-        <mapping class="model.ChiTietHoaDon"/>
-        <mapping class="model.ChiTietPhieuNhap"/>
-        <mapping class="model.ChiTietPhieuXuat"/>
-        <mapping class="model.ChiTietTopping"/>
-        <mapping class="model.HoaDon"/>
-        <mapping class="model.NguyenLieu"/>
-        <mapping class="model.PhieuNhapKho"/>
-        <mapping class="model.PhieuXuatKho"/>
-        <mapping class="model.SanPham"/>
-        <mapping class="model.Topping"/>
-        <mapping class="model.Sysdiagram"/>
+        <mapping class="Models.Ban"/>
+        <mapping class="Models.ChiTietHoaDon"/>
+        <mapping class="Models.ChiTietPhieuNhap"/>
+        <mapping class="Models.ChiTietPhieuXuat"/>
+        <mapping class="Models.ChiTietTopping"/>
+        <mapping class="Models.HoaDon"/>
+        <mapping class="Models.NguyenLieu"/>
+        <mapping class="Models.PhieuNhapKho"/>
+        <mapping class="Models.PhieuXuatKho"/>
+        <mapping class="Models.SanPham"/>
+        <mapping class="Models.Topping"/>
+        <mapping class="Models.Sysdiagram"/>
 
     </session-factory>
 </hibernate-configuration>

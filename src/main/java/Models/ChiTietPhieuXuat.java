@@ -1,4 +1,4 @@
-package model;
+package Models;
 
 import jakarta.persistence.*;
 
@@ -12,11 +12,11 @@ public class ChiTietPhieuXuat {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaPhieuXuat")
-    private model.PhieuXuatKho maPhieuXuat;
+    private Models.PhieuXuatKho maPhieuXuat;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaNguyenLieu")
-    private model.NguyenLieu maNguyenLieu;
+    private Models.NguyenLieu maNguyenLieu;
 
     @Column(name = "SoLuong", nullable = false, precision = 10, scale = 2)
     private BigDecimal soLuong;
@@ -29,19 +29,19 @@ public class ChiTietPhieuXuat {
         this.id = id;
     }
 
-    public model.PhieuXuatKho getMaPhieuXuat() {
+    public Models.PhieuXuatKho getMaPhieuXuat() {
         return maPhieuXuat;
     }
 
-    public void setMaPhieuXuat(model.PhieuXuatKho maPhieuXuat) {
+    public void setMaPhieuXuat(Models.PhieuXuatKho maPhieuXuat) {
         this.maPhieuXuat = maPhieuXuat;
     }
 
-    public model.NguyenLieu getMaNguyenLieu() {
+    public Models.NguyenLieu getMaNguyenLieu() {
         return maNguyenLieu;
     }
 
-    public void setMaNguyenLieu(model.NguyenLieu maNguyenLieu) {
+    public void setMaNguyenLieu(Models.NguyenLieu maNguyenLieu) {
         this.maNguyenLieu = maNguyenLieu;
     }
 

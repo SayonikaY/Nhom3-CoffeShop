@@ -1,4 +1,4 @@
-package model;
+package Models;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.Nationalized;
@@ -13,11 +13,11 @@ public class ChiTietHoaDon {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaHoaDon")
-    private model.HoaDon maHoaDon;
+    private Models.HoaDon maHoaDon;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaSanPham")
-    private model.SanPham maSanPham;
+    private Models.SanPham maSanPham;
 
     @Column(name = "SoLuong", nullable = false)
     private Integer soLuong;
@@ -38,19 +38,19 @@ public class ChiTietHoaDon {
         this.id = id;
     }
 
-    public model.HoaDon getMaHoaDon() {
+    public Models.HoaDon getMaHoaDon() {
         return maHoaDon;
     }
 
-    public void setMaHoaDon(model.HoaDon maHoaDon) {
+    public void setMaHoaDon(Models.HoaDon maHoaDon) {
         this.maHoaDon = maHoaDon;
     }
 
-    public model.SanPham getMaSanPham() {
+    public Models.SanPham getMaSanPham() {
         return maSanPham;
     }
 
-    public void setMaSanPham(model.SanPham maSanPham) {
+    public void setMaSanPham(Models.SanPham maSanPham) {
         this.maSanPham = maSanPham;
     }
 

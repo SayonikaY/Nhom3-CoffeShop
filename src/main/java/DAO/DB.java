@@ -1,8 +1,7 @@
-package model;
+package DAO;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 
@@ -18,13 +17,28 @@ import org.hibernate.cfg.Configuration;
  * And call shutdown() when close the program (exit button or sth you figure out yourself bruh)
  *
  * Example:
- *  Query: banList = session.createQuery("FROM Ban", Ban.class).list();
- *  Save: Database.saveAndClose(ban)
- *  Update, delete:
- *      tx = session.beginTransaction();
- *      session.merge(product);
- *      session.remove(product);
- *      tx.commit();
+ try {
+    session = DB.openSession(); // Get the session
+    tx = session.beginTransaction(); // Start a transaction
+
+        banDAO.save(...);
+        somethingelseDAO.save(..);
+        somethingelseDAO.delete(..);
+        nói chung là your code
+
+    tx.commit(); // Commit the transaction if all operations succeed
+
+    } catch (Exception e) {
+        if (tx != null) {
+        tx.rollback(); // Roll back the transaction if any error occurs
+        }
+    // Handle or log the exception
+    } finally {
+        if (session != null) {
+            DB.closeSession(); // Close the session in a finally block
+        }
+    }
+ }
  */
 
 public class DB {
@@ -50,37 +64,6 @@ public class DB {
         Session session = sessionFactory.openSession();
         threadLocalSession.set(session);
         return session;
-    }
-
-    /**
-     * Saves an entity to the database and closes the session
-     * @param entity The entity to save
-     * @return true if save was successful, false otherwise
-     */
-    public static boolean saveAndClose(Object entity) {
-        Session session = threadLocalSession.get();
-        if (session == null) {
-            session = openSession();
-        }
-
-        Transaction tx = null;
-        boolean success = false;
-
-        try {
-            tx = session.beginTransaction();
-            session.persist(entity);
-            tx.commit();
-            success = true;
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            e.printStackTrace();
-        } finally {
-            closeSession();
-        }
-
-        return success;
     }
 
     /**

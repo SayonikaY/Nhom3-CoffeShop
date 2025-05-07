@@ -1,4 +1,4 @@
-package model;
+package Models;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -17,7 +17,7 @@ public class ChiTietTopping {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaTopping")
-    private model.Topping maTopping;
+    private Models.Topping maTopping;
 
     @ColumnDefault("1")
     @Column(name = "SoLuong")
@@ -42,11 +42,11 @@ public class ChiTietTopping {
         this.maChiTiet = maChiTiet;
     }
 
-    public model.Topping getMaTopping() {
+    public Models.Topping getMaTopping() {
         return maTopping;
     }
 
-    public void setMaTopping(model.Topping maTopping) {
+    public void setMaTopping(Models.Topping maTopping) {
         this.maTopping = maTopping;
     }
 

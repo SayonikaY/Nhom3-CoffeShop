@@ -1,6 +1,6 @@
 package org.example;
 
-import model.DB;
+import DAO.DB;
 import org.hibernate.Session;
 
 public class Main {
