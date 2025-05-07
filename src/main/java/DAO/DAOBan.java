@@ -18,4 +18,12 @@ public class DAOBan extends BaseDAO<Ban, Integer> {
                 .setParameter("trangthai", trangthai)
                 .list();
     }
+
+    public void updateBanStatus(int id, String trangThai) {
+        Ban ban = findById(id);
+        if (ban != null) {
+            ban.setTrangThai(trangThai);
+            update(ban);
+        }
+    }
 }
