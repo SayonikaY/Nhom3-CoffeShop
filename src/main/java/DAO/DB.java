@@ -49,7 +49,7 @@ public class DB {
         try {
             Configuration configuration = new Configuration().configure();
             // Change schema strategy to validate to avoid modification attempts
-            configuration.setProperty("hibernate.hbm2ddl.auto", "validate");
+            configuration.setProperty("hibernate.hbm2ddl.auto", "none");
             sessionFactory = configuration.buildSessionFactory();
         } catch (Throwable ex) {
             System.err.println("Initial SessionFactory creation failed: " + ex);

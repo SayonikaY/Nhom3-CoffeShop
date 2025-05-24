@@ -3,6 +3,10 @@ package DAO;
 import Models.Ban;
 
 import java.util.List;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
 
 public class DAOBan extends BaseDAO<Ban, Integer> {
 
@@ -26,4 +30,22 @@ public class DAOBan extends BaseDAO<Ban, Integer> {
             update(ban);
         }
     }
+//    public List<Ban> findAll(){
+//        List<Ban> list = null;
+//        Session session = DB.openSession();
+//        Transaction tx = null;
+//        try {
+//            tx = session.beginTransaction();
+//            Query <Ban> query =session.createQuery("FROM Ban", Ban.class);
+//            list =query.list();
+//            tx.commit();
+//        } catch(Exception e) {
+//            if (tx != null) tx.rollback();
+//            e.printStackTrace();
+//        } finally {
+//            session.close();
+//        }
+//        return list;
+//    }
+    
 }

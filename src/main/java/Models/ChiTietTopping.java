@@ -12,7 +12,7 @@ public class ChiTietTopping {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MaChiTiet")
+    @JoinColumn(name = "MaChiTietHD")
     private ChiTietHoaDon maChiTiet;
 
     @ManyToOne(fetch = FetchType.LAZY)

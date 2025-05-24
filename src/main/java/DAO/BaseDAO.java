@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.Transaction;
+
 public abstract class BaseDAO<T, ID> {
     private Class<T> entityClass;
 

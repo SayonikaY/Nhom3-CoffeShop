@@ -10,6 +10,7 @@ import java.time.Instant;
 @Entity
 public class HoaDon {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaHoaDon", nullable = false)
     private Integer id;
 

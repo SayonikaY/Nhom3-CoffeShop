@@ -6,10 +6,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
+import jakarta.persistence.*;
 
 @Entity
 public class Ban {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaBan", nullable = false)
     private Integer id;
 
