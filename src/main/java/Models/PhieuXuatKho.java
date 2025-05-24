@@ -1,23 +1,22 @@
 package Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 public class PhieuXuatKho {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaPhieuXuat", nullable = false)
     private Integer id;
 
     @ColumnDefault("getdate()")
     @Column(name = "NgayXuat")
-    private Instant ngayXuat;
+    private LocalDateTime ngayXuat;
 
     @Nationalized
     @Column(name = "LyDo")
@@ -36,11 +35,11 @@ public class PhieuXuatKho {
         this.id = id;
     }
 
-    public Instant getNgayXuat() {
+    public LocalDateTime getNgayXuat() {
         return ngayXuat;
     }
 
-    public void setNgayXuat(Instant ngayXuat) {
+    public void setNgayXuat(LocalDateTime ngayXuat) {
         this.ngayXuat = ngayXuat;
     }
 

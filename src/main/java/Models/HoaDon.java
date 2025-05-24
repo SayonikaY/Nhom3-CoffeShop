@@ -6,10 +6,13 @@ import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 public class HoaDon {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaHoaDon", nullable = false)
     private Integer id;
 
@@ -19,7 +22,7 @@ public class HoaDon {
 
     @ColumnDefault("getdate()")
     @Column(name = "NgayLap")
-    private Instant ngayLap;
+    private LocalDateTime ngayLap;
 
     @ColumnDefault("0")
     @Column(name = "TongTien", precision = 10, scale = 2)
@@ -50,11 +53,11 @@ public class HoaDon {
         this.maBan = maBan;
     }
 
-    public Instant getNgayLap() {
+    public LocalDateTime getNgayLap() {
         return ngayLap;
     }
 
-    public void setNgayLap(Instant ngayLap) {
+    public void setNgayLap(LocalDateTime ngayLap) {
         this.ngayLap = ngayLap;
     }
 

@@ -1,9 +1,6 @@
 package Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
@@ -12,6 +9,7 @@ import java.math.BigDecimal;
 @Entity
 public class SanPham {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MaSanPham", nullable = false)
     private Integer id;
 
