@@ -1,15 +1,12 @@
-package nhom03.ui;
+package nhom03.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import nhom03.model.dao.ChiTietPhieuNhapDao;
 import nhom03.model.dao.NguyenLieuDao;
 import nhom03.model.dao.PhieuNhapKhoDao;
 import nhom03.model.entity.ChiTietPhieuNhap;
@@ -22,110 +19,51 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-public class PhieuNhapKhoManagementUI {
-    private final PhieuNhapKhoDao phieuNhapKhoDao;
-    private final NguyenLieuDao nguyenLieuDao;
-    private BorderPane view;
+public class PhieuNhapKhoController {
+    @FXML
+    private TextField tfSearch;
+
+    @FXML
     private TableView<PhieuNhapKho> tableView;
+
+    @FXML
     private TableView<ChiTietPhieuNhap> detailsTableView;
+
+    @FXML
+    private TextField tfMaPhieuNhap;
+
+    @FXML
+    private DatePicker dpNgayNhap;
+
+    @FXML
+    private TextField tfTongTien;
+
+    @FXML
+    private TextArea taGhiChu;
+
+    @FXML
+    private ComboBox<NguyenLieu> cbNguyenLieu;
+
+    @FXML
+    private TextField tfSoLuong;
+
+    @FXML
+    private TextField tfDonGia;
+
+    private PhieuNhapKhoDao phieuNhapKhoDao;
+    private NguyenLieuDao nguyenLieuDao;
+    private ChiTietPhieuNhapDao chiTietPhieuNhapDao;
+
     private ObservableList<PhieuNhapKho> phieuNhapList;
     private ObservableList<ChiTietPhieuNhap> chiTietList;
     private ObservableList<NguyenLieu> nguyenLieuList;
 
-    // Form fields
-    private TextField tfMaPhieuNhap;
-    private DatePicker dpNgayNhap;
-    private TextField tfTongTien;
-    private TextArea taGhiChu;
-    private TextField tfSearch;
-
-    // Import detail form fields
-    private ComboBox<NguyenLieu> cbNguyenLieu;
-    private TextField tfSoLuong;
-    private TextField tfDonGia;
-
-    public PhieuNhapKhoManagementUI(PhieuNhapKhoDao phieuNhapKhoDao, NguyenLieuDao nguyenLieuDao) {
-        this.phieuNhapKhoDao = phieuNhapKhoDao;
-        this.nguyenLieuDao = nguyenLieuDao;
-        createView();
-        loadData();
-    }
-
-    public BorderPane getView() {
-        return view;
-    }
-
-    private void createView() {
-        view = new BorderPane();
-
-        // Create top section with title and search
-        HBox topSection = createTopSection();
-        view.setTop(topSection);
-
-        // Create center section with tables
-        SplitPane splitPane = new SplitPane();
-
-        // Create import table
-        VBox importSection = new VBox(10);
-        importSection.setPadding(new Insets(10));
-        Label importLabel = new Label("Import Receipts");
-        importLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        createImportTableView();
-        importSection.getChildren().addAll(importLabel, tableView);
-
-        // Create import details table
-        VBox detailsSection = new VBox(10);
-        detailsSection.setPadding(new Insets(10));
-        Label detailsLabel = new Label("Import Details");
-        detailsLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        createDetailsTableView();
-        detailsSection.getChildren().addAll(detailsLabel, detailsTableView);
-
-        splitPane.getItems().addAll(importSection, detailsSection);
-        splitPane.setDividerPositions(0.6);
-        view.setCenter(splitPane);
-
-        // Create form
-        TabPane formPane = new TabPane();
-        formPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
-        Tab importTab = new Tab("Import Receipt");
-        importTab.setContent(createImportFormSection());
-
-        Tab detailsTab = new Tab("Import Details");
-        detailsTab.setContent(createDetailsFormSection());
-
-        formPane.getTabs().addAll(importTab, detailsTab);
-        view.setRight(formPane);
-    }
-
-    private HBox createTopSection() {
-        HBox topSection = new HBox(10);
-        topSection.setPadding(new Insets(10));
-
-        Label titleLabel = new Label("Ingredient Import Management");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        tfSearch = new TextField();
-        tfSearch.setPromptText("Search by date...");
-        tfSearch.setPrefWidth(300);
-
-        Button btnSearch = new Button("Search");
-        btnSearch.setOnAction(e -> searchPhieuNhap());
-
-        topSection.getChildren().addAll(titleLabel, tfSearch, btnSearch);
-
-        return topSection;
-    }
-
-    private void createImportTableView() {
-        tableView = new TableView<>();
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<PhieuNhapKho, Integer> colMaPhieuNhap = new TableColumn<>("ID");
+    public void initialize() {
+        // Initialize table columns for import receipts
+        TableColumn<PhieuNhapKho, Integer> colMaPhieuNhap = new TableColumn<>("Mã");
         colMaPhieuNhap.setCellValueFactory(new PropertyValueFactory<>("maPhieuNhap"));
 
-        TableColumn<PhieuNhapKho, LocalDateTime> colNgayNhap = new TableColumn<>("Date");
+        TableColumn<PhieuNhapKho, LocalDateTime> colNgayNhap = new TableColumn<>("Ngày nhập");
         colNgayNhap.setCellValueFactory(new PropertyValueFactory<>("ngayNhap"));
         colNgayNhap.setCellFactory(column -> new TableCell<>() {
             private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -141,31 +79,19 @@ public class PhieuNhapKhoManagementUI {
             }
         });
 
-        TableColumn<PhieuNhapKho, BigDecimal> colTongTien = new TableColumn<>("Total");
+        TableColumn<PhieuNhapKho, BigDecimal> colTongTien = new TableColumn<>("Tổng tiền");
         colTongTien.setCellValueFactory(new PropertyValueFactory<>("tongTien"));
 
-        TableColumn<PhieuNhapKho, String> colGhiChu = new TableColumn<>("Note");
+        TableColumn<PhieuNhapKho, String> colGhiChu = new TableColumn<>("Ghi chú");
         colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
 
         tableView.getColumns().addAll(colMaPhieuNhap, colNgayNhap, colTongTien, colGhiChu);
 
-        // Add selection listener
-        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                showPhieuNhapDetails(newSelection);
-                loadImportDetails(newSelection);
-            }
-        });
-    }
-
-    private void createDetailsTableView() {
-        detailsTableView = new TableView<>();
-        detailsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<ChiTietPhieuNhap, Integer> colMaChiTietNhap = new TableColumn<>("ID");
+        // Initialize table columns for import details
+        TableColumn<ChiTietPhieuNhap, Integer> colMaChiTietNhap = new TableColumn<>("Mã CT");
         colMaChiTietNhap.setCellValueFactory(new PropertyValueFactory<>("maChiTietNhap"));
 
-        TableColumn<ChiTietPhieuNhap, NguyenLieu> colNguyenLieu = new TableColumn<>("Ingredient");
+        TableColumn<ChiTietPhieuNhap, NguyenLieu> colNguyenLieu = new TableColumn<>("Nguyên liệu");
         colNguyenLieu.setCellValueFactory(new PropertyValueFactory<>("nguyenLieu"));
         colNguyenLieu.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -179,90 +105,15 @@ public class PhieuNhapKhoManagementUI {
             }
         });
 
-        TableColumn<ChiTietPhieuNhap, BigDecimal> colSoLuong = new TableColumn<>("Quantity");
+        TableColumn<ChiTietPhieuNhap, BigDecimal> colSoLuong = new TableColumn<>("Số lượng");
         colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
 
-        TableColumn<ChiTietPhieuNhap, BigDecimal> colDonGia = new TableColumn<>("Price");
+        TableColumn<ChiTietPhieuNhap, BigDecimal> colDonGia = new TableColumn<>("Giá nhập");
         colDonGia.setCellValueFactory(new PropertyValueFactory<>("donGia"));
 
         detailsTableView.getColumns().addAll(colMaChiTietNhap, colNguyenLieu, colSoLuong, colDonGia);
 
-        // Add selection listener
-        detailsTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                showChiTietDetails(newSelection);
-            }
-        });
-    }
-
-    private VBox createImportFormSection() {
-        VBox formSection = new VBox(10);
-        formSection.setPadding(new Insets(10));
-        formSection.setPrefWidth(300);
-
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
-        form.setPadding(new Insets(10));
-
-        // Create form fields
-        tfMaPhieuNhap = new TextField();
-        tfMaPhieuNhap.setEditable(false);
-        tfMaPhieuNhap.setPromptText("Auto-generated");
-
-        dpNgayNhap = new DatePicker();
-
-        tfTongTien = new TextField();
-        tfTongTien.setEditable(false);
-
-        taGhiChu = new TextArea();
-        taGhiChu.setPrefRowCount(3);
-
-        // Add fields to form
-        int row = 0;
-        form.add(new Label("ID:"), 0, row);
-        form.add(tfMaPhieuNhap, 1, row++);
-
-        form.add(new Label("Date:"), 0, row);
-        form.add(dpNgayNhap, 1, row++);
-
-        form.add(new Label("Total:"), 0, row);
-        form.add(tfTongTien, 1, row++);
-
-        form.add(new Label("Note:"), 0, row);
-        form.add(taGhiChu, 1, row++);
-
-        // Create buttons
-        HBox buttonBox = new HBox(10);
-
-        Button btnNew = new Button("New");
-        btnNew.setOnAction(e -> clearImportForm());
-
-        Button btnSave = new Button("Save");
-        btnSave.setOnAction(e -> savePhieuNhap());
-
-        Button btnDelete = new Button("Delete");
-        btnDelete.setOnAction(e -> deletePhieuNhap());
-
-        buttonBox.getChildren().addAll(btnNew, btnSave, btnDelete);
-
-        formSection.getChildren().addAll(form, buttonBox);
-
-        return formSection;
-    }
-
-    private VBox createDetailsFormSection() {
-        VBox formSection = new VBox(10);
-        formSection.setPadding(new Insets(10));
-        formSection.setPrefWidth(300);
-
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
-        form.setPadding(new Insets(10));
-
-        // Create form fields
-        cbNguyenLieu = new ComboBox<>();
+        // Set up converter for combo box
         cbNguyenLieu.setConverter(new StringConverter<>() {
             @Override
             public String toString(NguyenLieu nguyenLieu) {
@@ -275,38 +126,29 @@ public class PhieuNhapKhoManagementUI {
             }
         });
 
-        tfSoLuong = new TextField();
-        tfDonGia = new TextField();
+        // Add selection listeners
+        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                showPhieuNhapDetails(newSelection);
+                loadImportDetails(newSelection);
+            }
+        });
 
-        // Add fields to form
-        int row = 0;
-        form.add(new Label("Ingredient:"), 0, row);
-        form.add(cbNguyenLieu, 1, row++);
-
-        form.add(new Label("Quantity:"), 0, row);
-        form.add(tfSoLuong, 1, row++);
-
-        form.add(new Label("Price:"), 0, row);
-        form.add(tfDonGia, 1, row++);
-
-        // Create buttons
-        HBox buttonBox = new HBox(10);
-
-        Button btnAddDetail = new Button("Add");
-        btnAddDetail.setOnAction(e -> addImportDetail());
-
-        Button btnRemoveDetail = new Button("Remove");
-        btnRemoveDetail.setOnAction(e -> removeImportDetail());
-
-        buttonBox.getChildren().addAll(btnAddDetail, btnRemoveDetail);
-
-        formSection.getChildren().addAll(form, buttonBox);
-
-        return formSection;
+        detailsTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                showChiTietDetails(newSelection);
+            }
+        });
     }
 
-    private void loadData() {
-        // Load imports
+    public void setDaos(PhieuNhapKhoDao phieuNhapKhoDao, NguyenLieuDao nguyenLieuDao, ChiTietPhieuNhapDao chiTietPhieuNhapDao) {
+        this.phieuNhapKhoDao = phieuNhapKhoDao;
+        this.nguyenLieuDao = nguyenLieuDao;
+        this.chiTietPhieuNhapDao = chiTietPhieuNhapDao;
+    }
+
+    public void loadData() {
+        // Load import receipts
         List<PhieuNhapKho> phieuNhaps = phieuNhapKhoDao.findAll();
         phieuNhapList = FXCollections.observableArrayList(phieuNhaps);
         tableView.setItems(phieuNhapList);
@@ -315,15 +157,13 @@ public class PhieuNhapKhoManagementUI {
         List<NguyenLieu> nguyenLieus = nguyenLieuDao.findAll();
         nguyenLieuList = FXCollections.observableArrayList(nguyenLieus);
         cbNguyenLieu.setItems(nguyenLieuList);
-    }
 
-    private void loadImportDetails(PhieuNhapKho phieuNhap) {
-        // In a real application, you would load the import details from the database
-        // For this example, we'll just clear the table
+        // Initialize empty import details list
         chiTietList = FXCollections.observableArrayList();
         detailsTableView.setItems(chiTietList);
     }
 
+    @FXML
     private void searchPhieuNhap() {
         String searchText = tfSearch.getText().trim().toLowerCase();
         if (searchText.isEmpty()) {
@@ -344,7 +184,7 @@ public class PhieuNhapKhoManagementUI {
     private void showPhieuNhapDetails(PhieuNhapKho phieuNhap) {
         tfMaPhieuNhap.setText(String.valueOf(phieuNhap.getMaPhieuNhap()));
         // Set date picker value from LocalDateTime
-        // dpNgayNhap.setValue(phieuNhap.getNgayNhap().toLocalDate());
+        dpNgayNhap.setValue(phieuNhap.getNgayNhap().toLocalDate());
         tfTongTien.setText(phieuNhap.getTongTien().toString());
         taGhiChu.setText(phieuNhap.getGhiChu());
     }
@@ -355,6 +195,22 @@ public class PhieuNhapKhoManagementUI {
         tfDonGia.setText(chiTiet.getDonGia().toString());
     }
 
+    private void loadImportDetails(PhieuNhapKho phieuNhap) {
+        try {
+            // Load import details from the database
+            List<ChiTietPhieuNhap> chiTietPhieuNhaps = chiTietPhieuNhapDao.findByMaPhieuNhap(phieuNhap.getMaPhieuNhap());
+            chiTietList = FXCollections.observableArrayList(chiTietPhieuNhaps);
+            detailsTableView.setItems(chiTietList);
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Error loading import details: " + e.getMessage());
+            e.printStackTrace();
+            // Initialize empty list in case of error
+            chiTietList = FXCollections.observableArrayList();
+            detailsTableView.setItems(chiTietList);
+        }
+    }
+
+    @FXML
     private void clearImportForm() {
         tfMaPhieuNhap.clear();
         dpNgayNhap.setValue(null);
@@ -367,6 +223,7 @@ public class PhieuNhapKhoManagementUI {
         detailsTableView.setItems(chiTietList);
     }
 
+    @FXML
     private void savePhieuNhap() {
         try {
             // Validate input
@@ -407,6 +264,7 @@ public class PhieuNhapKhoManagementUI {
         }
     }
 
+    @FXML
     private void deletePhieuNhap() {
         if (tfMaPhieuNhap.getText().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "No import receipt selected");
@@ -433,6 +291,7 @@ public class PhieuNhapKhoManagementUI {
         }
     }
 
+    @FXML
     private void addImportDetail() {
         // In a real application, you would add the import detail to the database
         // For this example, we'll just add it to the table
@@ -481,6 +340,7 @@ public class PhieuNhapKhoManagementUI {
         }
     }
 
+    @FXML
     private void removeImportDetail() {
         ChiTietPhieuNhap selectedDetail = detailsTableView.getSelectionModel().getSelectedItem();
         if (selectedDetail == null) {

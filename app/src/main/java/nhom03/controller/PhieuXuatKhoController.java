@@ -1,15 +1,12 @@
-package nhom03.ui;
+package nhom03.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import nhom03.model.dao.ChiTietPhieuXuatDao;
 import nhom03.model.dao.NguyenLieuDao;
 import nhom03.model.dao.PhieuXuatKhoDao;
 import nhom03.model.entity.ChiTietPhieuXuat;
@@ -22,109 +19,48 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-public class PhieuXuatKhoManagementUI {
-    private final PhieuXuatKhoDao phieuXuatKhoDao;
-    private final NguyenLieuDao nguyenLieuDao;
-    private BorderPane view;
+public class PhieuXuatKhoController {
+    @FXML
+    private TextField tfSearch;
+
+    @FXML
     private TableView<PhieuXuatKho> tableView;
+
+    @FXML
     private TableView<ChiTietPhieuXuat> detailsTableView;
+
+    @FXML
+    private TextField tfMaPhieuXuat;
+
+    @FXML
+    private DatePicker dpNgayXuat;
+
+    @FXML
+    private TextField tfLyDo;
+
+    @FXML
+    private TextArea taGhiChu;
+
+    @FXML
+    private ComboBox<NguyenLieu> cbNguyenLieu;
+
+    @FXML
+    private TextField tfSoLuong;
+
+    private PhieuXuatKhoDao phieuXuatKhoDao;
+    private NguyenLieuDao nguyenLieuDao;
+    private ChiTietPhieuXuatDao chiTietPhieuXuatDao;
+
     private ObservableList<PhieuXuatKho> phieuXuatList;
     private ObservableList<ChiTietPhieuXuat> chiTietList;
     private ObservableList<NguyenLieu> nguyenLieuList;
 
-    // Form fields
-    private TextField tfMaPhieuXuat;
-    private DatePicker dpNgayXuat;
-    private TextField tfLyDo;
-    private TextArea taGhiChu;
-    private TextField tfSearch;
-
-    // Export detail form fields
-    private ComboBox<NguyenLieu> cbNguyenLieu;
-    private TextField tfSoLuong;
-
-    public PhieuXuatKhoManagementUI(PhieuXuatKhoDao phieuXuatKhoDao, NguyenLieuDao nguyenLieuDao) {
-        this.phieuXuatKhoDao = phieuXuatKhoDao;
-        this.nguyenLieuDao = nguyenLieuDao;
-        createView();
-        loadData();
-    }
-
-    public BorderPane getView() {
-        return view;
-    }
-
-    private void createView() {
-        view = new BorderPane();
-
-        // Create top section with title and search
-        HBox topSection = createTopSection();
-        view.setTop(topSection);
-
-        // Create center section with tables
-        SplitPane splitPane = new SplitPane();
-
-        // Create export table
-        VBox exportSection = new VBox(10);
-        exportSection.setPadding(new Insets(10));
-        Label exportLabel = new Label("Export Receipts");
-        exportLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        createExportTableView();
-        exportSection.getChildren().addAll(exportLabel, tableView);
-
-        // Create export details table
-        VBox detailsSection = new VBox(10);
-        detailsSection.setPadding(new Insets(10));
-        Label detailsLabel = new Label("Export Details");
-        detailsLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        createDetailsTableView();
-        detailsSection.getChildren().addAll(detailsLabel, detailsTableView);
-
-        splitPane.getItems().addAll(exportSection, detailsSection);
-        splitPane.setDividerPositions(0.6);
-        view.setCenter(splitPane);
-
-        // Create form
-        TabPane formPane = new TabPane();
-        formPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
-        Tab exportTab = new Tab("Export Receipt");
-        exportTab.setContent(createExportFormSection());
-
-        Tab detailsTab = new Tab("Export Details");
-        detailsTab.setContent(createDetailsFormSection());
-
-        formPane.getTabs().addAll(exportTab, detailsTab);
-        view.setRight(formPane);
-    }
-
-    private HBox createTopSection() {
-        HBox topSection = new HBox(10);
-        topSection.setPadding(new Insets(10));
-
-        Label titleLabel = new Label("Ingredient Export Management");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        tfSearch = new TextField();
-        tfSearch.setPromptText("Search by date...");
-        tfSearch.setPrefWidth(300);
-
-        Button btnSearch = new Button("Search");
-        btnSearch.setOnAction(e -> searchPhieuXuat());
-
-        topSection.getChildren().addAll(titleLabel, tfSearch, btnSearch);
-
-        return topSection;
-    }
-
-    private void createExportTableView() {
-        tableView = new TableView<>();
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<PhieuXuatKho, Integer> colMaPhieuXuat = new TableColumn<>("ID");
+    public void initialize() {
+        // Initialize table columns for export receipts
+        TableColumn<PhieuXuatKho, Integer> colMaPhieuXuat = new TableColumn<>("Mã");
         colMaPhieuXuat.setCellValueFactory(new PropertyValueFactory<>("maPhieuXuat"));
 
-        TableColumn<PhieuXuatKho, LocalDateTime> colNgayXuat = new TableColumn<>("Date");
+        TableColumn<PhieuXuatKho, LocalDateTime> colNgayXuat = new TableColumn<>("Ngày xuất");
         colNgayXuat.setCellValueFactory(new PropertyValueFactory<>("ngayXuat"));
         colNgayXuat.setCellFactory(column -> new TableCell<>() {
             private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -140,31 +76,19 @@ public class PhieuXuatKhoManagementUI {
             }
         });
 
-        TableColumn<PhieuXuatKho, String> colLyDo = new TableColumn<>("Reason");
+        TableColumn<PhieuXuatKho, String> colLyDo = new TableColumn<>("Lý do");
         colLyDo.setCellValueFactory(new PropertyValueFactory<>("lyDo"));
 
-        TableColumn<PhieuXuatKho, String> colGhiChu = new TableColumn<>("Note");
+        TableColumn<PhieuXuatKho, String> colGhiChu = new TableColumn<>("Ghi chú");
         colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
 
         tableView.getColumns().addAll(colMaPhieuXuat, colNgayXuat, colLyDo, colGhiChu);
 
-        // Add selection listener
-        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                showPhieuXuatDetails(newSelection);
-                loadExportDetails(newSelection);
-            }
-        });
-    }
-
-    private void createDetailsTableView() {
-        detailsTableView = new TableView<>();
-        detailsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<ChiTietPhieuXuat, Integer> colMaChiTietXuat = new TableColumn<>("ID");
+        // Initialize table columns for export details
+        TableColumn<ChiTietPhieuXuat, Integer> colMaChiTietXuat = new TableColumn<>("Mã CT");
         colMaChiTietXuat.setCellValueFactory(new PropertyValueFactory<>("maChiTietXuat"));
 
-        TableColumn<ChiTietPhieuXuat, NguyenLieu> colNguyenLieu = new TableColumn<>("Ingredient");
+        TableColumn<ChiTietPhieuXuat, NguyenLieu> colNguyenLieu = new TableColumn<>("Nguyên liệu");
         colNguyenLieu.setCellValueFactory(new PropertyValueFactory<>("nguyenLieu"));
         colNguyenLieu.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -178,86 +102,12 @@ public class PhieuXuatKhoManagementUI {
             }
         });
 
-        TableColumn<ChiTietPhieuXuat, BigDecimal> colSoLuong = new TableColumn<>("Quantity");
+        TableColumn<ChiTietPhieuXuat, BigDecimal> colSoLuong = new TableColumn<>("Số lượng");
         colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
 
         detailsTableView.getColumns().addAll(colMaChiTietXuat, colNguyenLieu, colSoLuong);
 
-        // Add selection listener
-        detailsTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                showChiTietDetails(newSelection);
-            }
-        });
-    }
-
-    private VBox createExportFormSection() {
-        VBox formSection = new VBox(10);
-        formSection.setPadding(new Insets(10));
-        formSection.setPrefWidth(300);
-
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
-        form.setPadding(new Insets(10));
-
-        // Create form fields
-        tfMaPhieuXuat = new TextField();
-        tfMaPhieuXuat.setEditable(false);
-        tfMaPhieuXuat.setPromptText("Auto-generated");
-
-        dpNgayXuat = new DatePicker();
-
-        tfLyDo = new TextField();
-
-        taGhiChu = new TextArea();
-        taGhiChu.setPrefRowCount(3);
-
-        // Add fields to form
-        int row = 0;
-        form.add(new Label("ID:"), 0, row);
-        form.add(tfMaPhieuXuat, 1, row++);
-
-        form.add(new Label("Date:"), 0, row);
-        form.add(dpNgayXuat, 1, row++);
-
-        form.add(new Label("Reason:"), 0, row);
-        form.add(tfLyDo, 1, row++);
-
-        form.add(new Label("Note:"), 0, row);
-        form.add(taGhiChu, 1, row++);
-
-        // Create buttons
-        HBox buttonBox = new HBox(10);
-
-        Button btnNew = new Button("New");
-        btnNew.setOnAction(e -> clearExportForm());
-
-        Button btnSave = new Button("Save");
-        btnSave.setOnAction(e -> savePhieuXuat());
-
-        Button btnDelete = new Button("Delete");
-        btnDelete.setOnAction(e -> deletePhieuXuat());
-
-        buttonBox.getChildren().addAll(btnNew, btnSave, btnDelete);
-
-        formSection.getChildren().addAll(form, buttonBox);
-
-        return formSection;
-    }
-
-    private VBox createDetailsFormSection() {
-        VBox formSection = new VBox(10);
-        formSection.setPadding(new Insets(10));
-        formSection.setPrefWidth(300);
-
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
-        form.setPadding(new Insets(10));
-
-        // Create form fields
-        cbNguyenLieu = new ComboBox<>();
+        // Set up converter for combo box
         cbNguyenLieu.setConverter(new StringConverter<>() {
             @Override
             public String toString(NguyenLieu nguyenLieu) {
@@ -270,34 +120,29 @@ public class PhieuXuatKhoManagementUI {
             }
         });
 
-        tfSoLuong = new TextField();
+        // Add selection listeners
+        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                showPhieuXuatDetails(newSelection);
+                loadExportDetails(newSelection);
+            }
+        });
 
-        // Add fields to form
-        int row = 0;
-        form.add(new Label("Ingredient:"), 0, row);
-        form.add(cbNguyenLieu, 1, row++);
-
-        form.add(new Label("Quantity:"), 0, row);
-        form.add(tfSoLuong, 1, row++);
-
-        // Create buttons
-        HBox buttonBox = new HBox(10);
-
-        Button btnAddDetail = new Button("Add");
-        btnAddDetail.setOnAction(e -> addExportDetail());
-
-        Button btnRemoveDetail = new Button("Remove");
-        btnRemoveDetail.setOnAction(e -> removeExportDetail());
-
-        buttonBox.getChildren().addAll(btnAddDetail, btnRemoveDetail);
-
-        formSection.getChildren().addAll(form, buttonBox);
-
-        return formSection;
+        detailsTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                showChiTietDetails(newSelection);
+            }
+        });
     }
 
-    private void loadData() {
-        // Load exports
+    public void setDaos(PhieuXuatKhoDao phieuXuatKhoDao, NguyenLieuDao nguyenLieuDao, ChiTietPhieuXuatDao chiTietPhieuXuatDao) {
+        this.phieuXuatKhoDao = phieuXuatKhoDao;
+        this.nguyenLieuDao = nguyenLieuDao;
+        this.chiTietPhieuXuatDao = chiTietPhieuXuatDao;
+    }
+
+    public void loadData() {
+        // Load export receipts
         List<PhieuXuatKho> phieuXuats = phieuXuatKhoDao.findAll();
         phieuXuatList = FXCollections.observableArrayList(phieuXuats);
         tableView.setItems(phieuXuatList);
@@ -306,15 +151,13 @@ public class PhieuXuatKhoManagementUI {
         List<NguyenLieu> nguyenLieus = nguyenLieuDao.findAll();
         nguyenLieuList = FXCollections.observableArrayList(nguyenLieus);
         cbNguyenLieu.setItems(nguyenLieuList);
-    }
 
-    private void loadExportDetails(PhieuXuatKho phieuXuat) {
-        // In a real application, you would load the export details from the database
-        // For this example, we'll just clear the table
+        // Initialize empty export details list
         chiTietList = FXCollections.observableArrayList();
         detailsTableView.setItems(chiTietList);
     }
 
+    @FXML
     private void searchPhieuXuat() {
         String searchText = tfSearch.getText().trim().toLowerCase();
         if (searchText.isEmpty()) {
@@ -335,7 +178,7 @@ public class PhieuXuatKhoManagementUI {
     private void showPhieuXuatDetails(PhieuXuatKho phieuXuat) {
         tfMaPhieuXuat.setText(String.valueOf(phieuXuat.getMaPhieuXuat()));
         // Set date picker value from LocalDateTime
-        // dpNgayXuat.setValue(phieuXuat.getNgayXuat().toLocalDate());
+        dpNgayXuat.setValue(phieuXuat.getNgayXuat().toLocalDate());
         tfLyDo.setText(phieuXuat.getLyDo());
         taGhiChu.setText(phieuXuat.getGhiChu());
     }
@@ -345,6 +188,22 @@ public class PhieuXuatKhoManagementUI {
         tfSoLuong.setText(chiTiet.getSoLuong().toString());
     }
 
+    private void loadExportDetails(PhieuXuatKho phieuXuat) {
+        try {
+            // Load export details from the database
+            List<ChiTietPhieuXuat> chiTietPhieuXuats = chiTietPhieuXuatDao.findByMaPhieuXuat(phieuXuat.getMaPhieuXuat());
+            chiTietList = FXCollections.observableArrayList(chiTietPhieuXuats);
+            detailsTableView.setItems(chiTietList);
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Error loading export details: " + e.getMessage());
+            e.printStackTrace();
+            // Initialize empty list in case of error
+            chiTietList = FXCollections.observableArrayList();
+            detailsTableView.setItems(chiTietList);
+        }
+    }
+
+    @FXML
     private void clearExportForm() {
         tfMaPhieuXuat.clear();
         dpNgayXuat.setValue(null);
@@ -357,6 +216,7 @@ public class PhieuXuatKhoManagementUI {
         detailsTableView.setItems(chiTietList);
     }
 
+    @FXML
     private void savePhieuXuat() {
         try {
             // Validate input
@@ -396,6 +256,7 @@ public class PhieuXuatKhoManagementUI {
         }
     }
 
+    @FXML
     private void deletePhieuXuat() {
         if (tfMaPhieuXuat.getText().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "No export receipt selected");
@@ -422,6 +283,7 @@ public class PhieuXuatKhoManagementUI {
         }
     }
 
+    @FXML
     private void addExportDetail() {
         // In a real application, you would add the export detail to the database
         // For this example, we'll just add it to the table
@@ -432,7 +294,8 @@ public class PhieuXuatKhoManagementUI {
                 return;
             }
 
-            if (cbNguyenLieu.getValue() == null || tfSoLuong.getText().trim().isEmpty()) {
+            if (cbNguyenLieu.getValue() == null ||
+                tfSoLuong.getText().trim().isEmpty()) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Please fill all required fields");
                 return;
             }
@@ -460,6 +323,7 @@ public class PhieuXuatKhoManagementUI {
         }
     }
 
+    @FXML
     private void removeExportDetail() {
         ChiTietPhieuXuat selectedDetail = detailsTableView.getSelectionModel().getSelectedItem();
         if (selectedDetail == null) {

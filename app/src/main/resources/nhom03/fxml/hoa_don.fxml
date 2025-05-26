@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/17.0.12"
+            fx:controller="nhom03.controller.HoaDonController">
+    <top>
+        <HBox spacing="10.0" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Quản lý hóa đơn"/>
+            <TextField fx:id="tfSearch" prefWidth="300.0" promptText="Tìm theo tên bàn"/>
+            <Button mnemonicParsing="false" onAction="#searchHoaDon" text="Tìm kiếm"/>
+        </HBox>
+    </top>
+    <center>
+        <SplitPane dividerPositions="0.6" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
+                <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Hóa đơn"/>
+                <TableView fx:id="tableView" VBox.vgrow="ALWAYS"/>
+            </VBox>
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
+                <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Chi tiết hóa đơn"/>
+                <TableView fx:id="detailsTableView" VBox.vgrow="ALWAYS"/>
+            </VBox>
+        </SplitPane>
+    </center>
+    <right>
+        <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <Tab text="Hóa đơn">
+                <VBox spacing="10.0">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <GridPane hgap="10.0" vgap="10.0">
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </padding>
+                        <columnConstraints>
+                            <ColumnConstraints/>
+                            <ColumnConstraints/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                        </rowConstraints>
+                        <Label text="Mã:"/>
+                        <TextField fx:id="tfMaHoaDon" editable="false" maxWidth="-Infinity" prefWidth="200.0"
+                                   promptText="Tự động tạo" GridPane.columnIndex="1"/>
+                        <Label text="Bàn:" GridPane.rowIndex="1"/>
+                        <ComboBox fx:id="cbBan" maxWidth="-Infinity" prefWidth="200.0" GridPane.columnIndex="1"
+                                  GridPane.rowIndex="1"/>
+                        <Label text="Ngày lập:" GridPane.rowIndex="2"/>
+                        <DatePicker fx:id="dpNgayLap" maxWidth="-Infinity" prefWidth="200.0" GridPane.columnIndex="1"
+                                    GridPane.rowIndex="2"/>
+                        <Label text="Tổng tiền:" GridPane.rowIndex="3"/>
+                        <TextField fx:id="tfTongTien" editable="false" maxWidth="-Infinity" prefWidth="200.0"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        <Label text="Giảm giá:" GridPane.rowIndex="4"/>
+                        <TextField fx:id="tfGiamGia" maxWidth="-Infinity" prefWidth="200.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="4"/>
+                        <Label text="Trạng thái:" GridPane.rowIndex="5"/>
+                        <ComboBox fx:id="cbTrangThai" maxWidth="-Infinity" prefWidth="200.0" GridPane.columnIndex="1"
+                                  GridPane.rowIndex="5"/>
+                    </GridPane>
+                    <HBox spacing="10.0">
+                        <Button mnemonicParsing="false" onAction="#clearOrderForm" text="Tạo mới"/>
+                        <Button mnemonicParsing="false" onAction="#saveHoaDon" text="Lưu"/>
+                        <Button mnemonicParsing="false" onAction="#deleteHoaDon" text="Xóa"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+            <Tab text="Chi tiết hóa đơn">
+                <VBox spacing="10.0">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <GridPane hgap="10.0" vgap="10.0">
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </padding>
+                        <columnConstraints>
+                            <ColumnConstraints/>
+                            <ColumnConstraints/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                        </rowConstraints>
+                        <Label text="Sản phẩm:"/>
+                        <ComboBox fx:id="cbSanPham" prefWidth="200.0" GridPane.columnIndex="1"/>
+                        <Label text="Số lượng:" GridPane.rowIndex="1"/>
+                        <TextField fx:id="tfSoLuong" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label text="Đơn giá:" GridPane.rowIndex="2"/>
+                        <TextField fx:id="tfDonGia" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Label text="Ghi chú:" GridPane.rowIndex="3"/>
+                        <TextArea fx:id="taGhiChu" prefRowCount="3" prefWidth="200.0" GridPane.columnIndex="1"
+                                  GridPane.rowIndex="3"/>
+                    </GridPane>
+                    <HBox spacing="10.0">
+                        <Button mnemonicParsing="false" onAction="#addOrderDetail" text="Thêm"/>
+                        <Button mnemonicParsing="false" onAction="#removeOrderDetail" text="Xóa"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </right>
+</BorderPane>

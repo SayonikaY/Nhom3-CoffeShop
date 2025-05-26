@@ -1,104 +1,79 @@
-package nhom03.ui;
+package nhom03.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import nhom03.model.dao.SanPhamDao;
 import nhom03.model.entity.LoaiSanPham;
 import nhom03.model.entity.SanPham;
 import nhom03.model.entity.TrangThaiSanPham;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-public class SanPhamManagementUI {
-    private final SanPhamDao sanPhamDao;
-    private BorderPane view;
-    private TableView<SanPham> tableView;
-    private ObservableList<SanPham> sanPhamList;
-
-    // Form fields
-    private TextField tfMaSanPham;
-    private TextField tfTenSanPham;
-    private ComboBox<String> cbLoaiSanPham;
-    private TextField tfDonGia;
-    private TextArea taMoTa;
-    private TextField tfHinhAnh;
-    private ComboBox<String> cbTrangThai;
+public class SanPhamController {
+    @FXML
     private TextField tfSearch;
 
-    public SanPhamManagementUI(SanPhamDao sanPhamDao) {
-        this.sanPhamDao = sanPhamDao;
-        createView();
-        loadData();
-    }
+    @FXML
+    private TableView<SanPham> tableView;
 
-    public BorderPane getView() {
-        return view;
-    }
+    @FXML
+    private TextField tfMaSanPham;
 
-    private void createView() {
-        view = new BorderPane();
+    @FXML
+    private TextField tfTenSanPham;
 
-        // Create top section with title and search
-        HBox topSection = createTopSection();
-        view.setTop(topSection);
+    @FXML
+    private ComboBox<String> cbLoaiSanPham;
 
-        // Create table view
-        createTableView();
-        view.setCenter(tableView);
+    @FXML
+    private TextField tfDonGia;
 
-        // Create form
-        VBox formSection = createFormSection();
-        view.setRight(formSection);
-    }
+    @FXML
+    private TextArea taMoTa;
 
-    private HBox createTopSection() {
-        HBox topSection = new HBox(10);
-        topSection.setPadding(new Insets(10));
+    @FXML
+    private TextField tfHinhAnh;
 
-        Label titleLabel = new Label("Food/Drinks Management");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+    @FXML
+    private ComboBox<String> cbTrangThai;
 
-        tfSearch = new TextField();
-        tfSearch.setPromptText("Search by name...");
-        tfSearch.setPrefWidth(300);
+    @FXML
+    private ImageView ivHinhAnh;
 
-        Button btnSearch = new Button("Search");
-        btnSearch.setOnAction(e -> searchSanPham());
+    private SanPhamDao sanPhamDao;
+    private ObservableList<SanPham> sanPhamList;
 
-        topSection.getChildren().addAll(titleLabel, tfSearch, btnSearch);
-
-        return topSection;
-    }
-
-    private void createTableView() {
-        tableView = new TableView<>();
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<SanPham, Integer> colMaSanPham = new TableColumn<>("ID");
+    public void initialize() {
+        // Initialize table columns
+        TableColumn<SanPham, Integer> colMaSanPham = new TableColumn<>("Mã");
         colMaSanPham.setCellValueFactory(new PropertyValueFactory<>("maSanPham"));
 
-        TableColumn<SanPham, String> colTenSanPham = new TableColumn<>("Name");
+        TableColumn<SanPham, String> colTenSanPham = new TableColumn<>("Tên");
         colTenSanPham.setCellValueFactory(new PropertyValueFactory<>("tenSanPham"));
 
-        TableColumn<SanPham, LoaiSanPham> colLoaiSanPham = new TableColumn<>("Type");
+        TableColumn<SanPham, LoaiSanPham> colLoaiSanPham = new TableColumn<>("Loại");
         colLoaiSanPham.setCellValueFactory(new PropertyValueFactory<>("loaiSanPham"));
 
-        TableColumn<SanPham, BigDecimal> colDonGia = new TableColumn<>("Price");
+        TableColumn<SanPham, BigDecimal> colDonGia = new TableColumn<>("Đơn giá");
         colDonGia.setCellValueFactory(new PropertyValueFactory<>("donGia"));
 
-        TableColumn<SanPham, TrangThaiSanPham> colTrangThai = new TableColumn<>("Status");
+        TableColumn<SanPham, TrangThaiSanPham> colTrangThai = new TableColumn<>("Trạng thái");
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
 
         tableView.getColumns().addAll(colMaSanPham, colTenSanPham, colLoaiSanPham, colDonGia, colTrangThai);
+
+        // Initialize combo boxes
+        cbLoaiSanPham.getItems().addAll("Đồ uống", "Đồ ăn", "Khác");
+        cbTrangThai.getItems().addAll("Còn", "Hết", "Ngưng");
 
         // Add selection listener
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -106,89 +81,24 @@ public class SanPhamManagementUI {
                 showSanPhamDetails(newSelection);
             }
         });
+
+        // Add listener to image path text field to update image when path changes
+        tfHinhAnh.textProperty().addListener((observable, oldValue, newValue) -> {
+            loadProductImage(newValue);
+        });
     }
 
-    private VBox createFormSection() {
-        VBox formSection = new VBox(10);
-        formSection.setPadding(new Insets(10));
-        formSection.setPrefWidth(300);
-
-        Label formTitle = new Label("Product Details");
-        formTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
-        form.setPadding(new Insets(10));
-
-        // Create form fields
-        tfMaSanPham = new TextField();
-        tfMaSanPham.setEditable(false);
-        tfMaSanPham.setPromptText("Auto-generated");
-
-        tfTenSanPham = new TextField();
-
-        cbLoaiSanPham = new ComboBox<>();
-        cbLoaiSanPham.getItems().addAll("Đồ uống", "Đồ ăn", "Khác");
-
-        tfDonGia = new TextField();
-
-        taMoTa = new TextArea();
-        taMoTa.setPrefRowCount(3);
-
-        tfHinhAnh = new TextField();
-
-        cbTrangThai = new ComboBox<>();
-        cbTrangThai.getItems().addAll("Còn", "Hết", "Ngưng");
-
-        // Add fields to form
-        int row = 0;
-        form.add(new Label("ID:"), 0, row);
-        form.add(tfMaSanPham, 1, row++);
-
-        form.add(new Label("Name:"), 0, row);
-        form.add(tfTenSanPham, 1, row++);
-
-        form.add(new Label("Type:"), 0, row);
-        form.add(cbLoaiSanPham, 1, row++);
-
-        form.add(new Label("Price:"), 0, row);
-        form.add(tfDonGia, 1, row++);
-
-        form.add(new Label("Description:"), 0, row);
-        form.add(taMoTa, 1, row++);
-
-        form.add(new Label("Image:"), 0, row);
-        form.add(tfHinhAnh, 1, row++);
-
-        form.add(new Label("Status:"), 0, row);
-        form.add(cbTrangThai, 1, row++);
-
-        // Create buttons
-        HBox buttonBox = new HBox(10);
-
-        Button btnNew = new Button("New");
-        btnNew.setOnAction(e -> clearForm());
-
-        Button btnSave = new Button("Save");
-        btnSave.setOnAction(e -> saveSanPham());
-
-        Button btnDelete = new Button("Delete");
-        btnDelete.setOnAction(e -> deleteSanPham());
-
-        buttonBox.getChildren().addAll(btnNew, btnSave, btnDelete);
-
-        formSection.getChildren().addAll(formTitle, form, buttonBox);
-
-        return formSection;
+    public void setSanPhamDao(SanPhamDao sanPhamDao) {
+        this.sanPhamDao = sanPhamDao;
     }
 
-    private void loadData() {
+    public void loadData() {
         List<SanPham> sanPhams = sanPhamDao.findAll();
         sanPhamList = FXCollections.observableArrayList(sanPhams);
         tableView.setItems(sanPhamList);
     }
 
+    @FXML
     private void searchSanPham() {
         String searchText = tfSearch.getText().trim().toLowerCase();
         if (searchText.isEmpty()) {
@@ -220,6 +130,9 @@ public class SanPhamManagementUI {
         taMoTa.setText(sanPham.getMoTa());
         tfHinhAnh.setText(sanPham.getHinhAnh());
 
+        // Load and display the image
+        loadProductImage(sanPham.getHinhAnh());
+
         switch (sanPham.getTrangThai()) {
             case CON -> cbTrangThai.setValue("Còn");
             case HET -> cbTrangThai.setValue("Hết");
@@ -227,6 +140,28 @@ public class SanPhamManagementUI {
         }
     }
 
+    private void loadProductImage(String imagePath) {
+        if (imagePath != null && !imagePath.isEmpty()) {
+            try {
+                File file = new File(imagePath);
+                if (file.exists()) {
+                    Image image = new Image(file.toURI().toString());
+                    ivHinhAnh.setImage(image);
+                } else {
+                    // Clear the image if file doesn't exist
+                    ivHinhAnh.setImage(null);
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading image: " + e.getMessage());
+                ivHinhAnh.setImage(null);
+            }
+        } else {
+            // Clear the image if path is null or empty
+            ivHinhAnh.setImage(null);
+        }
+    }
+
+    @FXML
     private void clearForm() {
         tfMaSanPham.clear();
         tfTenSanPham.clear();
@@ -235,9 +170,12 @@ public class SanPhamManagementUI {
         taMoTa.clear();
         tfHinhAnh.clear();
         cbTrangThai.setValue(null);
+        // Clear the image
+        ivHinhAnh.setImage(null);
         tableView.getSelectionModel().clearSelection();
     }
 
+    @FXML
     private void saveSanPham() {
         try {
             // Validate input
@@ -283,6 +221,7 @@ public class SanPhamManagementUI {
         }
     }
 
+    @FXML
     private void deleteSanPham() {
         if (tfMaSanPham.getText().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "No product selected");
@@ -315,5 +254,34 @@ public class SanPhamManagementUI {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void browseImageFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Image File");
+
+        // Set initial directory (optional)
+        String currentPath = tfHinhAnh.getText();
+        if (currentPath != null && !currentPath.isEmpty()) {
+            File currentFile = new File(currentPath);
+            if (currentFile.exists()) {
+                fileChooser.setInitialDirectory(currentFile.getParentFile());
+            }
+        }
+
+        // Add file extension filters
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp"),
+            new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+
+        // Show the dialog and get the selected file
+        File selectedFile = fileChooser.showOpenDialog(tfHinhAnh.getScene().getWindow());
+
+        // Update the image path text field with the selected file path
+        if (selectedFile != null) {
+            tfHinhAnh.setText(selectedFile.getAbsolutePath());
+        }
     }
 }

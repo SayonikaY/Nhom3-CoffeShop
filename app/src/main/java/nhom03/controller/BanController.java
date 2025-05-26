@@ -1,14 +1,10 @@
-package nhom03.ui;
+package nhom03.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import nhom03.model.dao.BanDao;
 import nhom03.model.entity.Ban;
 import nhom03.model.entity.TrangThaiBan;
@@ -16,81 +12,46 @@ import nhom03.model.entity.TrangThaiBan;
 import java.util.List;
 import java.util.Optional;
 
-public class BanManagementUI {
-    private final BanDao banDao;
-    private BorderPane view;
-    private TableView<Ban> tableView;
-    private ObservableList<Ban> banList;
-
-    // Form fields
-    private TextField tfMaBan;
-    private TextField tfTenBan;
-    private TextArea taGhiChu;
-    private ComboBox<String> cbTrangThai;
+public class BanController {
+    @FXML
     private TextField tfSearch;
 
-    public BanManagementUI(BanDao banDao) {
-        this.banDao = banDao;
-        createView();
-        loadData();
-    }
+    @FXML
+    private TableView<Ban> tableView;
 
-    public BorderPane getView() {
-        return view;
-    }
+    @FXML
+    private TextField tfMaBan;
 
-    private void createView() {
-        view = new BorderPane();
+    @FXML
+    private TextField tfTenBan;
 
-        // Create top section with title and search
-        HBox topSection = createTopSection();
-        view.setTop(topSection);
+    @FXML
+    private TextArea taGhiChu;
 
-        // Create table view
-        createTableView();
-        view.setCenter(tableView);
+    @FXML
+    private ComboBox<String> cbTrangThai;
 
-        // Create form
-        VBox formSection = createFormSection();
-        view.setRight(formSection);
-    }
+    private BanDao banDao;
+    private ObservableList<Ban> banList;
 
-    private HBox createTopSection() {
-        HBox topSection = new HBox(10);
-        topSection.setPadding(new Insets(10));
-
-        Label titleLabel = new Label("Table Management");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        tfSearch = new TextField();
-        tfSearch.setPromptText("Search by name...");
-        tfSearch.setPrefWidth(300);
-
-        Button btnSearch = new Button("Search");
-        btnSearch.setOnAction(e -> searchBan());
-
-        topSection.getChildren().addAll(titleLabel, tfSearch, btnSearch);
-
-        return topSection;
-    }
-
-    private void createTableView() {
-        tableView = new TableView<>();
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<Ban, Integer> colMaBan = new TableColumn<>("ID");
+    public void initialize() {
+        // Initialize table columns
+        TableColumn<Ban, Integer> colMaBan = new TableColumn<>("Mã");
         colMaBan.setCellValueFactory(new PropertyValueFactory<>("maBan"));
 
-        TableColumn<Ban, String> colTenBan = new TableColumn<>("Name");
+        TableColumn<Ban, String> colTenBan = new TableColumn<>("Tên");
         colTenBan.setCellValueFactory(new PropertyValueFactory<>("tenBan"));
 
-        TableColumn<Ban, String> colGhiChu = new TableColumn<>("Note");
+        TableColumn<Ban, String> colGhiChu = new TableColumn<>("Ghi chú");
         colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
 
-        TableColumn<Ban, TrangThaiBan> colTrangThai = new TableColumn<>("Status");
+        TableColumn<Ban, TrangThaiBan> colTrangThai = new TableColumn<>("Trạng thái");
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
 
         tableView.getColumns().addAll(colMaBan, colTenBan, colGhiChu, colTrangThai);
+
+        // Initialize combo box
+        cbTrangThai.getItems().addAll("Trống", "Đang sử dụng", "Đặt trước");
 
         // Add selection listener
         tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -100,71 +61,17 @@ public class BanManagementUI {
         });
     }
 
-    private VBox createFormSection() {
-        VBox formSection = new VBox(10);
-        formSection.setPadding(new Insets(10));
-        formSection.setPrefWidth(300);
-
-        Label formTitle = new Label("Table Details");
-        formTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
-        form.setPadding(new Insets(10));
-
-        // Create form fields
-        tfMaBan = new TextField();
-        tfMaBan.setEditable(false);
-        tfMaBan.setPromptText("Auto-generated");
-
-        tfTenBan = new TextField();
-
-        taGhiChu = new TextArea();
-        taGhiChu.setPrefRowCount(3);
-
-        cbTrangThai = new ComboBox<>();
-        cbTrangThai.getItems().addAll("Trống", "Đang sử dụng", "Đặt trước");
-
-        // Add fields to form
-        int row = 0;
-        form.add(new Label("ID:"), 0, row);
-        form.add(tfMaBan, 1, row++);
-
-        form.add(new Label("Name:"), 0, row);
-        form.add(tfTenBan, 1, row++);
-
-        form.add(new Label("Note:"), 0, row);
-        form.add(taGhiChu, 1, row++);
-
-        form.add(new Label("Status:"), 0, row);
-        form.add(cbTrangThai, 1, row++);
-
-        // Create buttons
-        HBox buttonBox = new HBox(10);
-
-        Button btnNew = new Button("New");
-        btnNew.setOnAction(e -> clearForm());
-
-        Button btnSave = new Button("Save");
-        btnSave.setOnAction(e -> saveBan());
-
-        Button btnDelete = new Button("Delete");
-        btnDelete.setOnAction(e -> deleteBan());
-
-        buttonBox.getChildren().addAll(btnNew, btnSave, btnDelete);
-
-        formSection.getChildren().addAll(formTitle, form, buttonBox);
-
-        return formSection;
+    public void setBanDao(BanDao banDao) {
+        this.banDao = banDao;
     }
 
-    private void loadData() {
+    public void loadData() {
         List<Ban> bans = banDao.findAll();
         banList = FXCollections.observableArrayList(bans);
         tableView.setItems(banList);
     }
 
+    @FXML
     private void searchBan() {
         String searchText = tfSearch.getText().trim().toLowerCase();
         if (searchText.isEmpty()) {
@@ -194,6 +101,7 @@ public class BanManagementUI {
         }
     }
 
+    @FXML
     private void clearForm() {
         tfMaBan.clear();
         tfTenBan.clear();
@@ -202,6 +110,7 @@ public class BanManagementUI {
         tableView.getSelectionModel().clearSelection();
     }
 
+    @FXML
     private void saveBan() {
         try {
             // Validate input
@@ -239,6 +148,7 @@ public class BanManagementUI {
         }
     }
 
+    @FXML
     private void deleteBan() {
         if (tfMaBan.getText().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "No table selected");

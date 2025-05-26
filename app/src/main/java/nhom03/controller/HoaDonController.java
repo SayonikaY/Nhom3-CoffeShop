@@ -1,16 +1,13 @@
-package nhom03.ui;
+package nhom03.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import nhom03.model.dao.BanDao;
+import nhom03.model.dao.ChiTietHoaDonDao;
 import nhom03.model.dao.HoaDonDao;
 import nhom03.model.dao.SanPhamDao;
 import nhom03.model.entity.*;
@@ -21,116 +18,62 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-public class HoaDonManagementUI {
-    private final HoaDonDao hoaDonDao;
-    private final BanDao banDao;
-    private final SanPhamDao sanPhamDao;
-    private BorderPane view;
+public class HoaDonController {
+    @FXML
+    private TextField tfSearch;
+
+    @FXML
     private TableView<HoaDon> tableView;
+
+    @FXML
     private TableView<ChiTietHoaDon> detailsTableView;
+
+    @FXML
+    private TextField tfMaHoaDon;
+
+    @FXML
+    private ComboBox<Ban> cbBan;
+
+    @FXML
+    private DatePicker dpNgayLap;
+
+    @FXML
+    private TextField tfTongTien;
+
+    @FXML
+    private TextField tfGiamGia;
+
+    @FXML
+    private ComboBox<String> cbTrangThai;
+
+    @FXML
+    private ComboBox<SanPham> cbSanPham;
+
+    @FXML
+    private TextField tfSoLuong;
+
+    @FXML
+    private TextField tfDonGia;
+
+    @FXML
+    private TextArea taGhiChu;
+
+    private HoaDonDao hoaDonDao;
+    private BanDao banDao;
+    private SanPhamDao sanPhamDao;
+    private ChiTietHoaDonDao chiTietHoaDonDao;
+
     private ObservableList<HoaDon> hoaDonList;
     private ObservableList<ChiTietHoaDon> chiTietList;
     private ObservableList<Ban> banList;
     private ObservableList<SanPham> sanPhamList;
 
-    // Form fields
-    private TextField tfMaHoaDon;
-    private ComboBox<Ban> cbBan;
-    private DatePicker dpNgayLap;
-    private TextField tfTongTien;
-    private TextField tfGiamGia;
-    private ComboBox<String> cbTrangThai;
-    private TextField tfSearch;
-
-    // Order detail form fields
-    private ComboBox<SanPham> cbSanPham;
-    private TextField tfSoLuong;
-    private TextField tfDonGia;
-    private TextArea taGhiChu;
-
-    public HoaDonManagementUI(HoaDonDao hoaDonDao, BanDao banDao, SanPhamDao sanPhamDao) {
-        this.hoaDonDao = hoaDonDao;
-        this.banDao = banDao;
-        this.sanPhamDao = sanPhamDao;
-        createView();
-        loadData();
-    }
-
-    public BorderPane getView() {
-        return view;
-    }
-
-    private void createView() {
-        view = new BorderPane();
-
-        // Create top section with title and search
-        HBox topSection = createTopSection();
-        view.setTop(topSection);
-
-        // Create center section with tables
-        SplitPane splitPane = new SplitPane();
-
-        // Create order table
-        VBox orderSection = new VBox(10);
-        orderSection.setPadding(new Insets(10));
-        Label orderLabel = new Label("Orders");
-        orderLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        createOrderTableView();
-        orderSection.getChildren().addAll(orderLabel, tableView);
-
-        // Create order details table
-        VBox detailsSection = new VBox(10);
-        detailsSection.setPadding(new Insets(10));
-        Label detailsLabel = new Label("Order Details");
-        detailsLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-        createDetailsTableView();
-        detailsSection.getChildren().addAll(detailsLabel, detailsTableView);
-
-        splitPane.getItems().addAll(orderSection, detailsSection);
-        splitPane.setDividerPositions(0.6);
-        view.setCenter(splitPane);
-
-        // Create form
-        TabPane formPane = new TabPane();
-        formPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
-        Tab orderTab = new Tab("Order");
-        orderTab.setContent(createOrderFormSection());
-
-        Tab detailsTab = new Tab("Order Details");
-        detailsTab.setContent(createDetailsFormSection());
-
-        formPane.getTabs().addAll(orderTab, detailsTab);
-        view.setRight(formPane);
-    }
-
-    private HBox createTopSection() {
-        HBox topSection = new HBox(10);
-        topSection.setPadding(new Insets(10));
-
-        Label titleLabel = new Label("Order Management");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        tfSearch = new TextField();
-        tfSearch.setPromptText("Search by table name...");
-        tfSearch.setPrefWidth(300);
-
-        Button btnSearch = new Button("Search");
-        btnSearch.setOnAction(e -> searchHoaDon());
-
-        topSection.getChildren().addAll(titleLabel, tfSearch, btnSearch);
-
-        return topSection;
-    }
-
-    private void createOrderTableView() {
-        tableView = new TableView<>();
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<HoaDon, Integer> colMaHoaDon = new TableColumn<>("ID");
+    public void initialize() {
+        // Initialize table columns for orders
+        TableColumn<HoaDon, Integer> colMaHoaDon = new TableColumn<>("Mã");
         colMaHoaDon.setCellValueFactory(new PropertyValueFactory<>("maHoaDon"));
 
-        TableColumn<HoaDon, Ban> colBan = new TableColumn<>("Table");
+        TableColumn<HoaDon, Ban> colBan = new TableColumn<>("Bàn");
         colBan.setCellValueFactory(new PropertyValueFactory<>("ban"));
         colBan.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -144,7 +87,7 @@ public class HoaDonManagementUI {
             }
         });
 
-        TableColumn<HoaDon, LocalDateTime> colNgayLap = new TableColumn<>("Date");
+        TableColumn<HoaDon, LocalDateTime> colNgayLap = new TableColumn<>("Ngày lập");
         colNgayLap.setCellValueFactory(new PropertyValueFactory<>("ngayLap"));
         colNgayLap.setCellFactory(column -> new TableCell<>() {
             private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -160,31 +103,19 @@ public class HoaDonManagementUI {
             }
         });
 
-        TableColumn<HoaDon, BigDecimal> colTongTien = new TableColumn<>("Total");
+        TableColumn<HoaDon, BigDecimal> colTongTien = new TableColumn<>("Tổng tiền");
         colTongTien.setCellValueFactory(new PropertyValueFactory<>("tongTien"));
 
-        TableColumn<HoaDon, TrangThaiHoaDon> colTrangThai = new TableColumn<>("Status");
+        TableColumn<HoaDon, TrangThaiHoaDon> colTrangThai = new TableColumn<>("Trạng thái");
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
 
         tableView.getColumns().addAll(colMaHoaDon, colBan, colNgayLap, colTongTien, colTrangThai);
 
-        // Add selection listener
-        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                showHoaDonDetails(newSelection);
-                loadOrderDetails(newSelection);
-            }
-        });
-    }
-
-    private void createDetailsTableView() {
-        detailsTableView = new TableView<>();
-        detailsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<ChiTietHoaDon, Integer> colMaChiTiet = new TableColumn<>("ID");
+        // Initialize table columns for order details
+        TableColumn<ChiTietHoaDon, Integer> colMaChiTiet = new TableColumn<>("Mã CT");
         colMaChiTiet.setCellValueFactory(new PropertyValueFactory<>("maChiTiet"));
 
-        TableColumn<ChiTietHoaDon, SanPham> colSanPham = new TableColumn<>("Product");
+        TableColumn<ChiTietHoaDon, SanPham> colSanPham = new TableColumn<>("Sản phẩm");
         colSanPham.setCellValueFactory(new PropertyValueFactory<>("sanPham"));
         colSanPham.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -198,41 +129,21 @@ public class HoaDonManagementUI {
             }
         });
 
-        TableColumn<ChiTietHoaDon, Integer> colSoLuong = new TableColumn<>("Quantity");
+        TableColumn<ChiTietHoaDon, Integer> colSoLuong = new TableColumn<>("Số lượng");
         colSoLuong.setCellValueFactory(new PropertyValueFactory<>("soLuong"));
 
-        TableColumn<ChiTietHoaDon, BigDecimal> colDonGia = new TableColumn<>("Price");
+        TableColumn<ChiTietHoaDon, BigDecimal> colDonGia = new TableColumn<>("Đơn giá");
         colDonGia.setCellValueFactory(new PropertyValueFactory<>("donGia"));
 
-        TableColumn<ChiTietHoaDon, String> colGhiChu = new TableColumn<>("Note");
+        TableColumn<ChiTietHoaDon, String> colGhiChu = new TableColumn<>("Ghi chú");
         colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
 
         detailsTableView.getColumns().addAll(colMaChiTiet, colSanPham, colSoLuong, colDonGia, colGhiChu);
 
-        // Add selection listener
-        detailsTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                showChiTietDetails(newSelection);
-            }
-        });
-    }
+        // Initialize combo boxes
+        cbTrangThai.getItems().addAll("Chưa thanh toán", "Đã thanh toán", "Hủy");
 
-    private VBox createOrderFormSection() {
-        VBox formSection = new VBox(10);
-        formSection.setPadding(new Insets(10));
-        formSection.setPrefWidth(300);
-
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
-        form.setPadding(new Insets(10));
-
-        // Create form fields
-        tfMaHoaDon = new TextField();
-        tfMaHoaDon.setEditable(false);
-        tfMaHoaDon.setPromptText("Auto-generated");
-
-        cbBan = new ComboBox<>();
+        // Set up converters for combo boxes
         cbBan.setConverter(new StringConverter<>() {
             @Override
             public String toString(Ban ban) {
@@ -245,67 +156,6 @@ public class HoaDonManagementUI {
             }
         });
 
-        dpNgayLap = new DatePicker();
-
-        tfTongTien = new TextField();
-        tfTongTien.setEditable(false);
-
-        tfGiamGia = new TextField();
-
-        cbTrangThai = new ComboBox<>();
-        cbTrangThai.getItems().addAll("Chưa thanh toán", "Đã thanh toán", "Hủy");
-
-        // Add fields to form
-        int row = 0;
-        form.add(new Label("ID:"), 0, row);
-        form.add(tfMaHoaDon, 1, row++);
-
-        form.add(new Label("Table:"), 0, row);
-        form.add(cbBan, 1, row++);
-
-        form.add(new Label("Date:"), 0, row);
-        form.add(dpNgayLap, 1, row++);
-
-        form.add(new Label("Total:"), 0, row);
-        form.add(tfTongTien, 1, row++);
-
-        form.add(new Label("Discount:"), 0, row);
-        form.add(tfGiamGia, 1, row++);
-
-        form.add(new Label("Status:"), 0, row);
-        form.add(cbTrangThai, 1, row++);
-
-        // Create buttons
-        HBox buttonBox = new HBox(10);
-
-        Button btnNew = new Button("New");
-        btnNew.setOnAction(e -> clearOrderForm());
-
-        Button btnSave = new Button("Save");
-        btnSave.setOnAction(e -> saveHoaDon());
-
-        Button btnDelete = new Button("Delete");
-        btnDelete.setOnAction(e -> deleteHoaDon());
-
-        buttonBox.getChildren().addAll(btnNew, btnSave, btnDelete);
-
-        formSection.getChildren().addAll(form, buttonBox);
-
-        return formSection;
-    }
-
-    private VBox createDetailsFormSection() {
-        VBox formSection = new VBox(10);
-        formSection.setPadding(new Insets(10));
-        formSection.setPrefWidth(300);
-
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
-        form.setPadding(new Insets(10));
-
-        // Create form fields
-        cbSanPham = new ComboBox<>();
         cbSanPham.setConverter(new StringConverter<>() {
             @Override
             public String toString(SanPham sanPham) {
@@ -318,42 +168,29 @@ public class HoaDonManagementUI {
             }
         });
 
-        tfSoLuong = new TextField();
-        tfDonGia = new TextField();
-        taGhiChu = new TextArea();
-        taGhiChu.setPrefRowCount(3);
+        // Add selection listeners
+        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                showHoaDonDetails(newSelection);
+                loadOrderDetails(newSelection);
+            }
+        });
 
-        // Add fields to form
-        int row = 0;
-        form.add(new Label("Product:"), 0, row);
-        form.add(cbSanPham, 1, row++);
-
-        form.add(new Label("Quantity:"), 0, row);
-        form.add(tfSoLuong, 1, row++);
-
-        form.add(new Label("Price:"), 0, row);
-        form.add(tfDonGia, 1, row++);
-
-        form.add(new Label("Note:"), 0, row);
-        form.add(taGhiChu, 1, row++);
-
-        // Create buttons
-        HBox buttonBox = new HBox(10);
-
-        Button btnAddDetail = new Button("Add");
-        btnAddDetail.setOnAction(e -> addOrderDetail());
-
-        Button btnRemoveDetail = new Button("Remove");
-        btnRemoveDetail.setOnAction(e -> removeOrderDetail());
-
-        buttonBox.getChildren().addAll(btnAddDetail, btnRemoveDetail);
-
-        formSection.getChildren().addAll(form, buttonBox);
-
-        return formSection;
+        detailsTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                showChiTietDetails(newSelection);
+            }
+        });
     }
 
-    private void loadData() {
+    public void setDaos(HoaDonDao hoaDonDao, BanDao banDao, SanPhamDao sanPhamDao, ChiTietHoaDonDao chiTietHoaDonDao) {
+        this.hoaDonDao = hoaDonDao;
+        this.banDao = banDao;
+        this.sanPhamDao = sanPhamDao;
+        this.chiTietHoaDonDao = chiTietHoaDonDao;
+    }
+
+    public void loadData() {
         // Load orders
         List<HoaDon> hoaDons = hoaDonDao.findAll();
         hoaDonList = FXCollections.observableArrayList(hoaDons);
@@ -368,15 +205,13 @@ public class HoaDonManagementUI {
         List<SanPham> sanPhams = sanPhamDao.findAll();
         sanPhamList = FXCollections.observableArrayList(sanPhams);
         cbSanPham.setItems(sanPhamList);
-    }
 
-    private void loadOrderDetails(HoaDon hoaDon) {
-        // In a real application, you would load the order details from the database
-        // For this example, we'll just clear the table
+        // Initialize empty order details list
         chiTietList = FXCollections.observableArrayList();
         detailsTableView.setItems(chiTietList);
     }
 
+    @FXML
     private void searchHoaDon() {
         String searchText = tfSearch.getText().trim().toLowerCase();
         if (searchText.isEmpty()) {
@@ -398,7 +233,7 @@ public class HoaDonManagementUI {
         tfMaHoaDon.setText(String.valueOf(hoaDon.getMaHoaDon()));
         cbBan.setValue(hoaDon.getBan());
         // Set date picker value from LocalDateTime
-        // dpNgayLap.setValue(hoaDon.getNgayLap().toLocalDate());
+        dpNgayLap.setValue(hoaDon.getNgayLap().toLocalDate());
         tfTongTien.setText(hoaDon.getTongTien().toString());
         tfGiamGia.setText(hoaDon.getGiamGia().toString());
 
@@ -416,6 +251,14 @@ public class HoaDonManagementUI {
         taGhiChu.setText(chiTiet.getGhiChu());
     }
 
+    private void loadOrderDetails(HoaDon hoaDon) {
+        // Load order details from the database
+        List<ChiTietHoaDon> chiTietHoaDons = chiTietHoaDonDao.findByMaHoaDon(hoaDon.getMaHoaDon());
+        chiTietList = FXCollections.observableArrayList(chiTietHoaDons);
+        detailsTableView.setItems(chiTietList);
+    }
+
+    @FXML
     private void clearOrderForm() {
         tfMaHoaDon.clear();
         cbBan.setValue(null);
@@ -430,6 +273,7 @@ public class HoaDonManagementUI {
         detailsTableView.setItems(chiTietList);
     }
 
+    @FXML
     private void saveHoaDon() {
         try {
             // Validate input
@@ -475,6 +319,7 @@ public class HoaDonManagementUI {
         }
     }
 
+    @FXML
     private void deleteHoaDon() {
         if (tfMaHoaDon.getText().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "No order selected");
@@ -501,6 +346,7 @@ public class HoaDonManagementUI {
         }
     }
 
+    @FXML
     private void addOrderDetail() {
         // In a real application, you would add the order detail to the database
         // For this example, we'll just add it to the table
@@ -551,6 +397,7 @@ public class HoaDonManagementUI {
         }
     }
 
+    @FXML
     private void removeOrderDetail() {
         ChiTietHoaDon selectedDetail = detailsTableView.getSelectionModel().getSelectedItem();
         if (selectedDetail == null) {

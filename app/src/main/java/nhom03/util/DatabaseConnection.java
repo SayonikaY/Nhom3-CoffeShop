@@ -4,19 +4,17 @@ import java.sql.*;
 
 public class DatabaseConnection {
     private static final String JDBC_URL = "jdbc:sqlserver://localhost:1433;"
-            + "databaseName=CoffeeShop;"
-            + "encrypt=true;"
-            + "trustServerCertificate=true;";
-    // + "integratedSecurity=true;";
+        + "databaseName=CoffeeShop;"
+        + "encrypt=true;"
+        + "trustServerCertificate=true;";
+        // + "integratedSecurity=true;";
     private static final String JDBC_USER = "sa";
     private static final String JDBC_PASSWORD = "P@ssw0rd";
 
     public static Connection getConnection() throws SQLException {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-
             return DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
-            // return DriverManager.getConnection(JDBC_URL);
         } catch (ClassNotFoundException e) {
             throw new SQLException("SQL Server JDBC Driver not found", e);
         }

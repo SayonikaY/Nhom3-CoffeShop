@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="mainLayout"
+            prefHeight="800.0" prefWidth="1200.0"
+            stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/21"
+            fx:controller="nhom03.controller.MainController">
+    <left>
+        <VBox spacing="10.0" style="-fx-background-color: #f0f0f0;" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+            <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="MENU"/>
+            <Button fx:id="btnSanPham" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#showSanPhamManagement" text="Quản lý sản phẩm"/>
+            <Button fx:id="btnBan" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#showBanManagement" text="Quản lý bàn"/>
+            <Button fx:id="btnHoaDon" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#showHoaDonManagement" text="Quản lý hóa đơn"/>
+            <Button fx:id="btnNguyenLieu" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#showNguyenLieuManagement" text="Quản lý nguyên liệu"/>
+            <Button fx:id="btnPhieuNhap" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#showPhieuNhapManagement" text="Quản lý nhập kho"/>
+            <Button fx:id="btnPhieuXuat" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#showPhieuXuatManagement" text="Quản lý xuất kho"/>
+        </VBox>
+    </left>
+    <center>
+        <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Welcome to Coffee Shop Management System"
+               BorderPane.alignment="CENTER"/>
+    </center>
+</BorderPane>

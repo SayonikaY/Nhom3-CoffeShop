@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/17.0.12"
+            fx:controller="nhom03.controller.PhieuNhapKhoController">
+    <top>
+        <HBox spacing="10.0" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Quản lý nhập kho"/>
+            <TextField fx:id="tfSearch" prefWidth="300.0" promptText="Tìm theo ngày"/>
+            <Button mnemonicParsing="false" onAction="#searchPhieuNhap" text="Tìm kiếm"/>
+        </HBox>
+    </top>
+    <center>
+        <SplitPane dividerPositions="0.6" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
+                <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Phiếu nhập"/>
+                <TableView fx:id="tableView" VBox.vgrow="ALWAYS"/>
+            </VBox>
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
+                <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Chi tiết phiếu nhập"/>
+                <TableView fx:id="detailsTableView" VBox.vgrow="ALWAYS"/>
+            </VBox>
+        </SplitPane>
+    </center>
+    <right>
+        <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <Tab text="Phiếu nhập">
+                <VBox spacing="10.0">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <GridPane hgap="10.0" vgap="10.0">
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </padding>
+                        <columnConstraints>
+                            <ColumnConstraints/>
+                            <ColumnConstraints/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                        </rowConstraints>
+                        <Label text="Mã:"/>
+                        <TextField fx:id="tfMaPhieuNhap" editable="false" prefWidth="200.0" promptText="Tự động tạo"
+                                   GridPane.columnIndex="1"/>
+                        <Label text="Ngày nhập:" GridPane.rowIndex="1"/>
+                        <DatePicker fx:id="dpNgayNhap" prefWidth="200.0" GridPane.columnIndex="1"
+                                    GridPane.rowIndex="1"/>
+                        <Label text="Tổng tiền:" GridPane.rowIndex="2"/>
+                        <TextField fx:id="tfTongTien" editable="false" prefWidth="200.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="2"/>
+                        <Label text="Ghi chú:" GridPane.rowIndex="3"/>
+                        <TextArea fx:id="taGhiChu" prefRowCount="3" prefWidth="200.0" GridPane.columnIndex="1"
+                                  GridPane.rowIndex="3"/>
+                    </GridPane>
+                    <HBox spacing="10.0">
+                        <Button mnemonicParsing="false" onAction="#clearImportForm" text="Tạo mới"/>
+                        <Button mnemonicParsing="false" onAction="#savePhieuNhap" text="Lưu"/>
+                        <Button mnemonicParsing="false" onAction="#deletePhieuNhap" text="Xóa"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+            <Tab text="Chi tiết phiếu nhập">
+                <VBox spacing="10.0">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                    <GridPane hgap="10.0" vgap="10.0">
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </padding>
+                        <columnConstraints>
+                            <ColumnConstraints/>
+                            <ColumnConstraints/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                            <RowConstraints/>
+                        </rowConstraints>
+                        <Label text="Nguyên liệu:"/>
+                        <ComboBox fx:id="cbNguyenLieu" prefWidth="200.0" GridPane.columnIndex="1"/>
+                        <Label text="Số lượng:" GridPane.rowIndex="1"/>
+                        <TextField fx:id="tfSoLuong" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label text="Đơn giá:" GridPane.rowIndex="2"/>
+                        <TextField fx:id="tfDonGia" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    </GridPane>
+                    <HBox spacing="10.0">
+                        <Button mnemonicParsing="false" onAction="#addImportDetail" text="Thêm"/>
+                        <Button mnemonicParsing="false" onAction="#removeImportDetail" text="Xóa"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </right>
+</BorderPane>

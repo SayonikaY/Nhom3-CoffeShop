@@ -1,14 +1,10 @@
-package nhom03.ui;
+package nhom03.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import nhom03.model.dao.NguyenLieuDao;
 import nhom03.model.entity.NguyenLieu;
 
@@ -16,82 +12,46 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-public class NguyenLieuManagementUI {
-    private final NguyenLieuDao nguyenLieuDao;
-    private BorderPane view;
-    private TableView<NguyenLieu> tableView;
-    private ObservableList<NguyenLieu> nguyenLieuList;
-
-    // Form fields
-    private TextField tfMaNguyenLieu;
-    private TextField tfTenNguyenLieu;
-    private TextField tfDonViTinh;
-    private TextField tfSoLuongTon;
-    private TextField tfDonGiaNhap;
+public class NguyenLieuController {
+    @FXML
     private TextField tfSearch;
 
-    public NguyenLieuManagementUI(NguyenLieuDao nguyenLieuDao) {
-        this.nguyenLieuDao = nguyenLieuDao;
-        createView();
-        loadData();
-    }
+    @FXML
+    private TableView<NguyenLieu> tableView;
 
-    public BorderPane getView() {
-        return view;
-    }
+    @FXML
+    private TextField tfMaNguyenLieu;
 
-    private void createView() {
-        view = new BorderPane();
+    @FXML
+    private TextField tfTenNguyenLieu;
 
-        // Create top section with title and search
-        HBox topSection = createTopSection();
-        view.setTop(topSection);
+    @FXML
+    private TextField tfDonViTinh;
 
-        // Create table view
-        createTableView();
-        view.setCenter(tableView);
+    @FXML
+    private TextField tfSoLuongTon;
 
-        // Create form
-        VBox formSection = createFormSection();
-        view.setRight(formSection);
-    }
+    @FXML
+    private TextField tfDonGiaNhap;
 
-    private HBox createTopSection() {
-        HBox topSection = new HBox(10);
-        topSection.setPadding(new Insets(10));
+    private NguyenLieuDao nguyenLieuDao;
+    private ObservableList<NguyenLieu> nguyenLieuList;
 
-        Label titleLabel = new Label("Ingredient Management");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-        tfSearch = new TextField();
-        tfSearch.setPromptText("Search by name...");
-        tfSearch.setPrefWidth(300);
-
-        Button btnSearch = new Button("Search");
-        btnSearch.setOnAction(e -> searchNguyenLieu());
-
-        topSection.getChildren().addAll(titleLabel, tfSearch, btnSearch);
-
-        return topSection;
-    }
-
-    private void createTableView() {
-        tableView = new TableView<>();
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<NguyenLieu, Integer> colMaNguyenLieu = new TableColumn<>("ID");
+    public void initialize() {
+        // Initialize table columns
+        TableColumn<NguyenLieu, Integer> colMaNguyenLieu = new TableColumn<>("Mã");
         colMaNguyenLieu.setCellValueFactory(new PropertyValueFactory<>("maNguyenLieu"));
 
-        TableColumn<NguyenLieu, String> colTenNguyenLieu = new TableColumn<>("Name");
+        TableColumn<NguyenLieu, String> colTenNguyenLieu = new TableColumn<>("Tên");
         colTenNguyenLieu.setCellValueFactory(new PropertyValueFactory<>("tenNguyenLieu"));
 
-        TableColumn<NguyenLieu, String> colDonViTinh = new TableColumn<>("Unit");
+        TableColumn<NguyenLieu, String> colDonViTinh = new TableColumn<>("Đơn vị");
         colDonViTinh.setCellValueFactory(new PropertyValueFactory<>("donViTinh"));
 
-        TableColumn<NguyenLieu, BigDecimal> colSoLuongTon = new TableColumn<>("Stock");
+        TableColumn<NguyenLieu, BigDecimal> colSoLuongTon = new TableColumn<>("Số lượng tồn");
         colSoLuongTon.setCellValueFactory(new PropertyValueFactory<>("soLuongTon"));
 
-        TableColumn<NguyenLieu, BigDecimal> colDonGiaNhap = new TableColumn<>("Price");
+        TableColumn<NguyenLieu, BigDecimal> colDonGiaNhap = new TableColumn<>("Giá nhập");
         colDonGiaNhap.setCellValueFactory(new PropertyValueFactory<>("donGiaNhap"));
 
         tableView.getColumns().addAll(colMaNguyenLieu, colTenNguyenLieu, colDonViTinh, colSoLuongTon, colDonGiaNhap);
@@ -104,71 +64,17 @@ public class NguyenLieuManagementUI {
         });
     }
 
-    private VBox createFormSection() {
-        VBox formSection = new VBox(10);
-        formSection.setPadding(new Insets(10));
-        formSection.setPrefWidth(300);
-
-        Label formTitle = new Label("Ingredient Details");
-        formTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-        GridPane form = new GridPane();
-        form.setHgap(10);
-        form.setVgap(10);
-        form.setPadding(new Insets(10));
-
-        // Create form fields
-        tfMaNguyenLieu = new TextField();
-        tfMaNguyenLieu.setEditable(false);
-        tfMaNguyenLieu.setPromptText("Auto-generated");
-
-        tfTenNguyenLieu = new TextField();
-        tfDonViTinh = new TextField();
-        tfSoLuongTon = new TextField();
-        tfDonGiaNhap = new TextField();
-
-        // Add fields to form
-        int row = 0;
-        form.add(new Label("ID:"), 0, row);
-        form.add(tfMaNguyenLieu, 1, row++);
-
-        form.add(new Label("Name:"), 0, row);
-        form.add(tfTenNguyenLieu, 1, row++);
-
-        form.add(new Label("Unit:"), 0, row);
-        form.add(tfDonViTinh, 1, row++);
-
-        form.add(new Label("Stock:"), 0, row);
-        form.add(tfSoLuongTon, 1, row++);
-
-        form.add(new Label("Price:"), 0, row);
-        form.add(tfDonGiaNhap, 1, row++);
-
-        // Create buttons
-        HBox buttonBox = new HBox(10);
-
-        Button btnNew = new Button("New");
-        btnNew.setOnAction(e -> clearForm());
-
-        Button btnSave = new Button("Save");
-        btnSave.setOnAction(e -> saveNguyenLieu());
-
-        Button btnDelete = new Button("Delete");
-        btnDelete.setOnAction(e -> deleteNguyenLieu());
-
-        buttonBox.getChildren().addAll(btnNew, btnSave, btnDelete);
-
-        formSection.getChildren().addAll(formTitle, form, buttonBox);
-
-        return formSection;
+    public void setNguyenLieuDao(NguyenLieuDao nguyenLieuDao) {
+        this.nguyenLieuDao = nguyenLieuDao;
     }
 
-    private void loadData() {
+    public void loadData() {
         List<NguyenLieu> nguyenLieus = nguyenLieuDao.findAll();
         nguyenLieuList = FXCollections.observableArrayList(nguyenLieus);
         tableView.setItems(nguyenLieuList);
     }
 
+    @FXML
     private void searchNguyenLieu() {
         String searchText = tfSearch.getText().trim().toLowerCase();
         if (searchText.isEmpty()) {
@@ -194,6 +100,7 @@ public class NguyenLieuManagementUI {
         tfDonGiaNhap.setText(nguyenLieu.getDonGiaNhap().toString());
     }
 
+    @FXML
     private void clearForm() {
         tfMaNguyenLieu.clear();
         tfTenNguyenLieu.clear();
@@ -203,6 +110,7 @@ public class NguyenLieuManagementUI {
         tableView.getSelectionModel().clearSelection();
     }
 
+    @FXML
     private void saveNguyenLieu() {
         try {
             // Validate input
@@ -246,6 +154,7 @@ public class NguyenLieuManagementUI {
         }
     }
 
+    @FXML
     private void deleteNguyenLieu() {
         if (tfMaNguyenLieu.getText().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "No ingredient selected");
