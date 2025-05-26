@@ -1,0 +1,21 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <MSSQLCodeStyleSettings version="7">
+      <option name="CONSTRAINT_WRAP_2" value="true" />
+      <option name="CONSTRAINT_WRAP_3" value="true" />
+    </MSSQLCodeStyleSettings>
+    <SqlCodeStyleSettings version="7">
+      <option name="KEYWORD_CASE" value="2" />
+      <option name="TYPE_CASE" value="3" />
+      <option name="QUOTE_TYPE" value="20" />
+      <option name="QUERY_EL_COMMA" value="1" />
+      <option name="CONSTRAINT_WRAP_2" value="true" />
+      <option name="CONSTRAINT_WRAP_3" value="true" />
+      <option name="CONSTRAINT_WRAP_4" value="true" />
+      <option name="POST_OPT_WRAP_2" value="false" />
+      <option name="POST_OPT_INDENT" value="false" />
+      <option name="VIEW_WRAP_AS" value="true" />
+      <option name="SCRIPT_STMT_SEMICOLON_WRAP" value="2" />
+    </SqlCodeStyleSettings>
+  </code_scheme>
+</component>
