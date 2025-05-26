@@ -7,7 +7,7 @@ public class DatabaseConnection {
         + "databaseName=CoffeeShop;"
         + "encrypt=true;"
         + "trustServerCertificate=true;";
-        // + "integratedSecurity=true;";
+    // + "integratedSecurity=true;";
     private static final String JDBC_USER = "sa";
     private static final String JDBC_PASSWORD = "P@ssw0rd";
 
