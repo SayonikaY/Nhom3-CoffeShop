@@ -9,6 +9,8 @@ repositories {
 
 dependencies {
     implementation("com.microsoft.sqlserver:mssql-jdbc:12.10.0.jre11")
+    implementation("org.hibernate.orm:hibernate-core:6.4.0.Final")
+    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
 }
 
 java {
